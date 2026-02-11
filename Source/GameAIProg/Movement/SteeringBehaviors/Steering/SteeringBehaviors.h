@@ -30,7 +30,31 @@ class Seek : public ISteeringBehavior
 {
 public:
 	Seek() = default;
-	virtual ~Seek() = default;
 
 	virtual SteeringOutput CalculateSteering(float DeltaT, ASteeringAgent & Agent) override;
-}
+};
+
+class Flee : public ISteeringBehavior
+{
+public:
+	Flee() = default;
+	
+	virtual SteeringOutput CalculateSteering(float DeltaT, ASteeringAgent & Agent) override;
+};
+
+class Arrive : public ISteeringBehavior
+{
+public:
+	Arrive() = default;
+	Arrive(ASteeringAgent & Agent);
+	
+	virtual SteeringOutput CalculateSteering(float DeltaT, ASteeringAgent & Agent) override;
+	
+private:
+	
+	float m_CachedMaxVelocity{};
+	
+	float m_SlowRadius{10.f};
+	float m_TargetRadius{1.f};
+};
+//draw debug directional arrow
