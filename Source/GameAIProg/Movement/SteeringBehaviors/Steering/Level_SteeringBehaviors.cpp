@@ -114,7 +114,7 @@ void ALevel_SteeringBehaviors::Tick(float DeltaTime)
 			ImGui::PushItemWidth(100);
 
 			// Add the names of your steering behaviors
-			if (ImGui::Combo("", &a.SelectedBehavior, "Seek\0Wander\0Flee\0Arrive\0Evade\0Pursuit", 4))
+			if (ImGui::Combo("", &a.SelectedBehavior, "Seek\0Wander\0Flee\0Arrive\0Evade\0Pursuit\0Face", 4))
 			{
 				bBehaviourModified = true;
 			}
@@ -235,7 +235,11 @@ void ALevel_SteeringBehaviors::SetAgentBehavior(ImGui_Agent& Agent)
 		break;
 		
 	case BehaviorTypes::Arrive:
-		Agent.Behavior = std::make_unique<Arrive>();
+		Agent.Behavior = std::make_unique<Arrive>(Agent.Agent); 
+		break;
+		
+	case BehaviorTypes::Face:
+		Agent.Behavior = std::make_unique<Face>();
 		break;
 		
 	default:

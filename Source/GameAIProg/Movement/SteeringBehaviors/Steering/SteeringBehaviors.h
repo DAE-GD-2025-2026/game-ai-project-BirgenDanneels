@@ -46,7 +46,7 @@ class Arrive : public ISteeringBehavior
 {
 public:
 	Arrive() = default;
-	Arrive(ASteeringAgent & Agent);
+	Arrive(const ASteeringAgent* Agent);
 	
 	virtual SteeringOutput CalculateSteering(float DeltaT, ASteeringAgent & Agent) override;
 	
@@ -54,7 +54,16 @@ private:
 	
 	float m_CachedMaxVelocity{};
 	
-	float m_SlowRadius{10.f};
-	float m_TargetRadius{1.f};
+	float m_SlowRadius{500.f};
+	float m_TargetRadius{100.f};
 };
+
+class Face : public ISteeringBehavior
+{
+public:
+	Face() = default;
+	
+	virtual SteeringOutput CalculateSteering(float DeltaT, ASteeringAgent & Agent) override;
+};
+
 //draw debug directional arrow
