@@ -245,6 +245,10 @@ void ALevel_SteeringBehaviors::SetAgentBehavior(ImGui_Agent& Agent)
 		autoOrient = false;
 		break;
 		
+	case BehaviorTypes::Pursuit:
+		Agent.Behavior = std::make_unique<Persuit>();
+		break;
+		
 	default:
 		assert(false); // Incorrect Agent Behavior gotten during SetAgentBehavior()	
 	} 

@@ -102,20 +102,20 @@ SteeringOutput Face::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
     Forward.Normalize();
 
     // Compute signed angle (rad)
-    float AngleDiffRad = FMath::Atan2(ToTarget.Y, ToTarget.X) - FMath::Atan2(Forward.Y, Forward.X);
+    const float AngleDiffRad = FMath::Atan2(ToTarget.Y, ToTarget.X) - FMath::Atan2(Forward.Y, Forward.X);
 
     // Convert to degrees
     float AngleDiffDeg = FMath::RadiansToDegrees(AngleDiffRad);
     AngleDiffDeg = FMath::UnwindDegrees(AngleDiffDeg);
 
     // Desired angular velocity
-    float MaxAngularSpeed = Agent.GetMaxAngularSpeed();
+    const float MaxAngularSpeed = Agent.GetMaxAngularSpeed();
     Steering.AngularVelocity = FMath::Clamp(AngleDiffDeg, -MaxAngularSpeed, MaxAngularSpeed);
 
     // Draw debug
     if (Agent.GetDebugRenderingEnabled())
     {
-        float DebugArrowLength = 150.f;
+        const float DebugArrowLength = 150.f;
         
         // Draw forward vector
         DrawDebugDirectionalArrow(Agent.GetWorld(),
@@ -144,6 +144,30 @@ SteeringOutput Face::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 
     }
     
+    return Steering;
+}
+
+SteeringOutput Persuit::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
+{
+    SteeringOutput Steering = {};
+    
+    const float TimeToReachT{ static_cast<float>((Target.Position - Agent.GetPosition()).Length()) / Agent.GetMaxLinearSpeed()};
+    FVector2D predictedPos{Target.Position + (Target.LinearVelocity * TimeToReachT)};
+
+    Steering.LinearVelocity = predictedPos - Agent.GetPosition();
+
+    if (Agent.GetDebugRenderingEnabled())
+    {
+        float DebugArrowLength = 150.f;
+        
+        // Draw direction arrow
+        DrawDebugDirectionalArrow(Agent.GetWorld(),
+            FVector(Agent.GetPosition(), 0),
+            FVector(Agent.GetPosition(), 0) + FVector(Steering.LinearVelocity.GetClampedToSize(-1, 1), 0) * DebugArrowLength,
+            20,
+            FColor::Red);
+    }
+ 
     return Steering;
 }
 
