@@ -223,6 +223,8 @@ void ALevel_SteeringBehaviors::SetAgentBehavior(ImGui_Agent& Agent)
 {
 	Agent.Behavior.reset();
 	
+	bool autoOrient = true;
+	
 	switch (static_cast<BehaviorTypes>(Agent.SelectedBehavior))
 	{
 	//TODO; Implement behaviors setting here
@@ -240,6 +242,7 @@ void ALevel_SteeringBehaviors::SetAgentBehavior(ImGui_Agent& Agent)
 		
 	case BehaviorTypes::Face:
 		Agent.Behavior = std::make_unique<Face>();
+		autoOrient = false;
 		break;
 		
 	default:
@@ -249,6 +252,7 @@ void ALevel_SteeringBehaviors::SetAgentBehavior(ImGui_Agent& Agent)
 	UpdateTarget(Agent);
 	
 	Agent.Agent->SetSteeringBehavior(Agent.Behavior.get());
+	Agent.Agent->SetIsAutoOrienting(autoOrient);
 }
 
 void ALevel_SteeringBehaviors::RefreshTargetLabels()

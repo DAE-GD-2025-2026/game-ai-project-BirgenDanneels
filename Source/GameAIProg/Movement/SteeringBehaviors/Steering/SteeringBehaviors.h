@@ -58,12 +58,11 @@ private:
 	float m_TargetRadius{100.f};
 };
 
-class Face : public ISteeringBehavior
+class Face: public ISteeringBehavior
 {
 public:
 	Face() = default;
+	virtual ~Face() override = default;
 	
 	virtual SteeringOutput CalculateSteering(float DeltaT, ASteeringAgent & Agent) override;
 };
-
-//draw debug directional arrow

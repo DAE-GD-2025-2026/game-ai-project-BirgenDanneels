@@ -42,16 +42,16 @@ SteeringOutput Arrive::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
     Steering.LinearVelocity = Target.Position - Agent.GetPosition();
     
     //Calculate Speed
-    double distance {(Target.Position - Agent.GetPosition()).Length()};
-    if (distance > m_SlowRadius)
+    double Distance {(Target.Position - Agent.GetPosition()).Length()};
+    if (Distance > m_SlowRadius)
         Agent.SetMaxLinearSpeed(m_CachedMaxVelocity);
-    else if (distance < m_TargetRadius)
+    else if (Distance < m_TargetRadius)
         Agent.SetMaxLinearSpeed(0);
     else
     {
-        float speedMultiplier = (distance - m_TargetRadius) / (m_SlowRadius - m_TargetRadius);
+        float SpeedMultiplier = (Distance - m_TargetRadius) / (m_SlowRadius - m_TargetRadius);
         
-        Agent.SetMaxLinearSpeed(m_CachedMaxVelocity * speedMultiplier);
+        Agent.SetMaxLinearSpeed(m_CachedMaxVelocity * SpeedMultiplier);
     }
     
     if (Agent.GetDebugRenderingEnabled())
@@ -71,7 +71,7 @@ SteeringOutput Arrive::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
             false );
         // Draw Target radius
         DrawDebugCircle(Agent.GetWorld(),
-            Agent.GetActorLocation(),
+        FVector(Agent.GetPosition(), 0),
             m_TargetRadius,
             32,
             FColor::Red,
@@ -90,17 +90,62 @@ SteeringOutput Arrive::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 SteeringOutput Face::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 {
     SteeringOutput Steering = {};
-    
-    // const FVector2D dstnVector{ Target.Position - Agent.GetPosition() };
-    // const FVector2D forwardVector{ cos(Agent.GetRotation()), sin(Agent.GetRotation()) };
-    // const float angle1 = FMath::Atan2(dstnVector.X, dstnVector.Y);
-    // const float angle2 = FMath::Atan2(forwardVector.X, forwardVector.Y);
-    // float angle = FMath::RadiansToDegrees(angle1 - angle2);
-    // if(angle > 180.0f) angle -= 360.0f; else if(angle < -180.0f) angle += 360.0f;
-    //
-    // Steering.AngularVelocity = angle;
+
+    // Direction to target
+    FVector ToTarget = FVector(Target.Position, 0) - Agent.GetActorLocation();
+    ToTarget.Z = 0.f; // ignore vertical rotation
+    ToTarget.Normalize();
+
+    // Agent forward vector
+    FVector Forward = Agent.GetActorForwardVector();
+    Forward.Z = 0.f;
+    Forward.Normalize();
+
+    // Compute signed angle (rad)
+    float AngleDiffRad = FMath::Atan2(ToTarget.Y, ToTarget.X) - FMath::Atan2(Forward.Y, Forward.X);
+
+    // Convert to degrees
+    float AngleDiffDeg = FMath::RadiansToDegrees(AngleDiffRad);
+    AngleDiffDeg = FMath::UnwindDegrees(AngleDiffDeg);
+
+    // Desired angular velocity
+    float MaxAngularSpeed = Agent.GetMaxAngularSpeed();
+    Steering.AngularVelocity = FMath::Clamp(AngleDiffDeg, -MaxAngularSpeed, MaxAngularSpeed);
+
+    // Draw debug
+    if (Agent.GetDebugRenderingEnabled())
+    {
+        float DebugArrowLength = 150.f;
+        
+        // Draw forward vector
+        DrawDebugDirectionalArrow(Agent.GetWorld(),
+            FVector(Agent.GetPosition(), 0),
+            FVector(Agent.GetPosition(), 0) + Forward * DebugArrowLength,
+            20,
+            FColor::Blue);
+        
+        //Draw desired vector
+        DrawDebugDirectionalArrow(Agent.GetWorld(),
+            FVector(Agent.GetPosition(), 0),
+            FVector(Agent.GetPosition(), 0) + ToTarget * DebugArrowLength,
+            20,
+            FColor::Red);
+        
+        //Draw angle difference
+        FVector TextLocation = Agent.GetActorLocation() + FVector(0,0,50);
+        DrawDebugString(Agent.GetWorld(), 
+            TextLocation, 
+            FString::Printf(TEXT("Angle: %.1f"), 
+                AngleDiffDeg), 
+                nullptr, 
+                FColor::Yellow, 
+                0.f, 
+                true);
+
+    }
     
     return Steering;
 }
+
 
 // TODO: Do the Week01 assignment :^)
