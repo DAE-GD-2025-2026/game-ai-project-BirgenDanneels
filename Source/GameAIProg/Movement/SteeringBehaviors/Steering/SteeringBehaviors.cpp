@@ -171,5 +171,29 @@ SteeringOutput Persuit::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
     return Steering;
 }
 
+SteeringOutput Evade::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
+{
+    SteeringOutput Steering = {};
+    
+    const float TimeToReachT{ static_cast<float>((Target.Position - Agent.GetPosition()).Length()) / Agent.GetMaxLinearSpeed()};
+    FVector2D predictedPos{Target.Position + (Target.LinearVelocity * TimeToReachT)};
+
+    Steering.LinearVelocity = Agent.GetPosition() - predictedPos;
+
+    if (Agent.GetDebugRenderingEnabled())
+    {
+        float DebugArrowLength = 150.f;
+        
+        // Draw direction arrow
+        DrawDebugDirectionalArrow(Agent.GetWorld(),
+            FVector(Agent.GetPosition(), 0),
+            FVector(Agent.GetPosition(), 0) + FVector(Steering.LinearVelocity.GetClampedToSize(-1, 1), 0) * DebugArrowLength,
+            20,
+            FColor::Red);
+    }
+ 
+    return Steering;
+}
+
 
 // TODO: Do the Week01 assignment :^)
