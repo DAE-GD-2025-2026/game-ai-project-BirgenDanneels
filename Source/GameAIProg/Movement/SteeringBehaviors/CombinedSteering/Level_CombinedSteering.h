@@ -31,6 +31,18 @@ private:
 	//Datamembers
 	bool UseMouseTarget = false;
 	bool CanDebugRender = false;
+	
+	//Shader
+	Wander* m_pWander = nullptr;
 
+	// Blended Steering
+	ASteeringAgent* pDrunkAgent = nullptr;
+	BlendedSteering* pBlendedSteering = nullptr;
+	Seek* pSeek = nullptr;
+
+	// Priority Steering
+	// ASteeringAgent* m_pEvadingAgent = nullptr;
+	// PrioritySteering* m_pPrioritySteering = nullptr;
+	// Evade* m_pEvade = nullptr;
 	
 };
