@@ -32,8 +32,8 @@ private:
 	bool UseMouseTarget = false;
 	bool CanDebugRender = false;
 	
-	//Shader
-	Wander* m_pWander = nullptr;
+	//Shared
+	Wander* pWander = nullptr;
 
 	// Blended Steering
 	ASteeringAgent* pDrunkAgent = nullptr;
@@ -41,8 +41,8 @@ private:
 	Seek* pSeek = nullptr;
 
 	// Priority Steering
-	// ASteeringAgent* m_pEvadingAgent = nullptr;
-	// PrioritySteering* m_pPrioritySteering = nullptr;
-	// Evade* m_pEvade = nullptr;
+	ASteeringAgent* pEvadingAgent = nullptr;
+	PrioritySteering* pPrioritySteering = nullptr;
+	Evade* pEvade = nullptr;
 	
 };

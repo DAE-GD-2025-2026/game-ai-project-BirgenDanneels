@@ -16,13 +16,13 @@ void ALevel_CombinedSteering::BeginPlay()
 	Super::BeginPlay();
 	
 	// Blended Steering
-	m_pWander = new Wander();
+	pWander = new Wander();
 	pSeek = new Seek();
 
 	pBlendedSteering = new BlendedSteering(
 		{
 			{pSeek, 0.5f},
-			{m_pWander, 0.5f}
+			{pWander, 0.5f}
 		});
 
 	pDrunkAgent = GetWorld()->SpawnActor<ASteeringAgent>(SteeringAgentClass, FVector{0,0,90}, FRotator::ZeroRotator);;
@@ -31,16 +31,14 @@ void ALevel_CombinedSteering::BeginPlay()
 	pDrunkAgent->SetMass(1.f);
 
 	//Priority Steering
-	// m_pEvade = new Evade();
-	//
-	// m_pPrioritySteering = new PrioritySteering(
-	// 	{m_pEvade, m_pWander });
-	//
-	// m_pEvadingAgent = new ASteeringAgent();
-	// m_pEvadingAgent->SetSteeringBehavior(m_pPrioritySteering);
-	// m_pEvadingAgent->SetMaxLinearSpeed(15.f);
-	// m_pEvadingAgent->SetIsAutoOrienting(true);
-	// m_pEvadingAgent->SetMass(1.f);
+	pEvade = new Evade();
+	
+	pPrioritySteering = new PrioritySteering(
+	 	{pEvade, pWander });
+	
+	pEvadingAgent =  GetWorld()->SpawnActor<ASteeringAgent>(SteeringAgentClass, FVector{200,200,90}, FRotator::ZeroRotator);;
+	pEvadingAgent->SetSteeringBehavior(pPrioritySteering);
+	pEvadingAgent->SetIsAutoOrienting(true);
 }
 
 void ALevel_CombinedSteering::BeginDestroy()
@@ -126,5 +124,10 @@ void ALevel_CombinedSteering::Tick(float DeltaTime)
 	// Combined Steering Update
 	pSeek->SetTarget(MouseTarget);
 	
- // TODO: implement Make sure to also evade the wanderer
+	//Priority Steering Update
+	FSteeringParams evadeTarget{};
+	evadeTarget.Position = pDrunkAgent->GetPosition();
+	evadeTarget.LinearVelocity = pDrunkAgent->GetLinearVelocity();
+
+	pEvade->SetTarget(evadeTarget);
 }

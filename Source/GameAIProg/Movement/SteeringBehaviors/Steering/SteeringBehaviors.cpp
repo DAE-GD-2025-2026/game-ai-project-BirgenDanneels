@@ -206,12 +206,16 @@ SteeringOutput Persuit::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 SteeringOutput Evade::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 {
     SteeringOutput Steering = {};
+    const float Distance{ static_cast<float>((Target.Position - Agent.GetPosition()).Length()) };
     
-    const float TimeToReachT{ static_cast<float>((Target.Position - Agent.GetPosition()).Length()) / Agent.GetMaxLinearSpeed()};
-    FVector2D predictedPos{Target.Position + (Target.LinearVelocity * TimeToReachT)};
+    if (Distance < EvasionRadius)
+    {
+        const float TimeToReachT{ Distance / Agent.GetMaxLinearSpeed()};
+        FVector2D predictedPos{Target.Position + (Target.LinearVelocity * TimeToReachT)};
 
-    Steering.LinearVelocity = Agent.GetPosition() - predictedPos;
-
+        Steering.LinearVelocity = Agent.GetPosition() - predictedPos;
+    }
+    else Steering.IsValid = false;
     if (Agent.GetDebugRenderingEnabled())
     {
         float DebugArrowLength = 150.f;
@@ -222,6 +226,20 @@ SteeringOutput Evade::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
             FVector(Agent.GetPosition(), 0) + FVector(Steering.LinearVelocity.GetClampedToSize(-1, 1), 0) * DebugArrowLength,
             20,
             FColor::Red);
+        
+        // Draw Evade radius
+        DrawDebugCircle(Agent.GetWorld(),
+            FVector( Agent.GetPosition(), 0),
+            EvasionRadius,
+            32,
+            FColor::Blue,
+            false,
+            -1,
+            0,
+            2.f,
+            FVector(1,0,0),
+            FVector(0,1,0),
+            false );
     }
  
     return Steering;
