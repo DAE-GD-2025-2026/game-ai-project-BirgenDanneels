@@ -3,7 +3,6 @@
 
 #include "Level_Flocking.h"
 
-
 // Sets default values
 ALevel_Flocking::ALevel_Flocking()
 {
@@ -19,6 +18,22 @@ void ALevel_Flocking::BeginPlay()
 	TrimWorld->SetTrimWorldSize(3000.f);
 	TrimWorld->bShouldTrimWorld = true;
 
+	//Create Agent to evade
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride =
+		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	
+	pAgentToEvade = GetWorld()->SpawnActor<ASteeringAgent>(EvadeAgentClass, FVector{0.f, 0.f, 90.f}, FRotator::ZeroRotator, SpawnParams);
+	
+	if (IsValid(pAgentToEvade))
+	{
+		pEvadeAgentWander = std::make_unique<Wander>();
+		pAgentToEvade->SetSteeringBehavior(pEvadeAgentWander.get());
+		pAgentToEvade->SetIsAutoOrienting(true);
+	}
+	
+	
+	
 	pFlock = TUniquePtr<Flock>(
 		new Flock(
 			GetWorld(),

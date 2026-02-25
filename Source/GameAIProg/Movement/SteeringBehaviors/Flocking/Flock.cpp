@@ -20,6 +20,10 @@ Flock::Flock(
 	Neighbors.SetNum(FlockSize - 1);
 	
 	//Spawn Agents
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride =
+		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	
 	float HalfSize = WorldSize * 0.5f;
 	for (int i = 0; i < FlockSize; ++i)
 	{
@@ -28,7 +32,7 @@ Flock::Flock(
 			FMath::RandRange(-HalfSize, HalfSize),
 			90.f
 		};
-		Agents[i] = pWorld->SpawnActor<ASteeringAgent>(AgentClass, SpawnPos, FRotator::ZeroRotator);
+		Agents[i] = pWorld->SpawnActor<ASteeringAgent>(AgentClass, SpawnPos, FRotator::ZeroRotator, SpawnParams);
 		if (IsValid(Agents[i]))
 		{
 			Agents[i]->SetActorTickEnabled(false); //Manual Tick
@@ -56,10 +60,16 @@ Flock::Flock(
 		{pSeekBehavior.get(), 0.51f}
 	});
 	
+	pPrioritySteering = std::make_unique<PrioritySteering>(
+	std::vector<ISteeringBehavior*>{
+		pEvadeBehavior.get(),
+		pBlendedSteering.get()
+	});
+	
 	for (int i = 0; i < FlockSize; ++i)
 	{
 		if (IsValid(Agents[i]))
-			Agents[i]->SetSteeringBehavior(pBlendedSteering.get());
+			Agents[i]->SetSteeringBehavior(pPrioritySteering.get());
 	}
 }
 
@@ -70,6 +80,16 @@ Flock::~Flock()
 
 void Flock::Tick(float DeltaTime)
 {
+	// Update Evade target
+	if (IsValid(pAgentToEvade) && pEvadeBehavior)
+	{
+		FSteeringParams evadeTarget{};
+		evadeTarget.Position       = pAgentToEvade->GetPosition();
+		evadeTarget.Orientation    = pAgentToEvade->GetRotation();
+		evadeTarget.LinearVelocity = pAgentToEvade->GetLinearVelocity();
+		pEvadeBehavior->SetTarget(evadeTarget);
+	}
+	
 	for (ASteeringAgent* agent : Agents)
 	{
 		if (!IsValid(agent)) continue;
@@ -80,7 +100,8 @@ void Flock::Tick(float DeltaTime)
 
 void Flock::RenderDebug()
 {
- // TODO: Render all the agents in the flock
+	if (DebugRenderNeighborhood)
+		RenderNeighborhood();
 }
 
 void Flock::ImGuiRender(ImVec2 const& WindowPos, ImVec2 const& WindowSize)
@@ -162,7 +183,42 @@ void Flock::ImGuiRender(ImVec2 const& WindowPos, ImVec2 const& WindowSize)
 
 void Flock::RenderNeighborhood()
 {
- // TODO: Debugrender the neighbors for the first agent in the flock
+	RegisterNeighbors(Agents[0]);
+	
+	const float DebugCircleHeight{90};
+	
+	// Draw Neighborhood Radius
+	DrawDebugCircle(pWorld,
+		FVector( Agents[0]->GetPosition(), DebugCircleHeight),
+		NeighborhoodRadius,
+		32,
+		FColor::Black,
+		false,
+		-1,
+		0,
+		4.f,
+		FVector(1,0,0),
+		FVector(0,1,0),
+		false );
+	
+	// Draw a circle for every agent in the neighborhood
+	const float NeighborDebugRadius{20};
+	
+	for (int idx{0}; idx < NrOfNeighbors; ++idx)
+	{
+		DrawDebugCircle(pWorld,
+			FVector( Neighbors[idx]->GetPosition(), DebugCircleHeight),
+			NeighborDebugRadius,
+			32,
+			FColor::Green,
+			false,
+			-1,
+			0,
+			6.f,
+			FVector(1,0,0),
+			FVector(0,1,0),
+			false );
+	}
 }
 
 #ifndef GAMEAI_USE_SPACE_PARTITIONING
