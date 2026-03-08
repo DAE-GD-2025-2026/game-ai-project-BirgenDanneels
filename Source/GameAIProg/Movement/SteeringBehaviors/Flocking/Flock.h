@@ -60,7 +60,7 @@ private:
 
 	TArray<ASteeringAgent*> Neighbors{};
 	
-	float NeighborhoodRadius{400.f};
+	float NeighborhoodRadius{200.f};
 	int NrOfNeighbors{0};
 
 	ASteeringAgent* pAgentToEvade{nullptr};

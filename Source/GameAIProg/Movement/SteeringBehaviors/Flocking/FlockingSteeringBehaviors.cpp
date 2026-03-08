@@ -35,7 +35,7 @@ SteeringOutput Separation::CalculateSteering(float deltaT, ASteeringAgent& pAgen
 	}
 
 	// Normalize vector then scale to max speed
-	Steering.LinearVelocity = Steering.LinearVelocity.GetSafeNormal() * pAgent.GetMaxLinearSpeed();
+	Steering.LinearVelocity = Steering.LinearVelocity.GetSafeNormal();
 
 	Steering.IsValid = true;
 	return Steering;
@@ -51,7 +51,7 @@ SteeringOutput VelocityMatch::CalculateSteering(float deltaT, ASteeringAgent& pA
 
 	FVector2D AverageVelocity = pFlock->GetAverageNeighborVelocity();;
 
-	Steering.LinearVelocity = AverageVelocity.GetSafeNormal() * pAgent.GetMaxLinearSpeed();
+	Steering.LinearVelocity = AverageVelocity.GetSafeNormal();
 
 	Steering.IsValid = true;
 	return Steering;

@@ -82,6 +82,9 @@ Flock::Flock(
 		}
 	}
 	
+	//Set neighborhood radius to cell size
+	NeighborhoodRadius = WorldSize / NrOfCellsX * 1.5;
+	
 }
 
 Flock::~Flock()
@@ -292,11 +295,11 @@ FVector2D Flock::GetAverageNeighborPos() const
 {
 	FVector2D AveragePosition = FVector2D::ZeroVector;
 
-	for (int i = 0; i < NrOfNeighbors; ++i)
-		AveragePosition += Neighbors[i]->GetPosition();
+	for (int i = 0; i < GetNrOfNeighbors(); ++i)
+		AveragePosition += GetNeighbors()[i]->GetPosition();
 
-	if (NrOfNeighbors > 0)
-		AveragePosition /= static_cast<float>(NrOfNeighbors);
+	if (GetNrOfNeighbors() > 0)
+		AveragePosition /= static_cast<float>(GetNrOfNeighbors());
 
 	return AveragePosition;
 }
@@ -305,11 +308,11 @@ FVector2D Flock::GetAverageNeighborVelocity() const
 {
 	FVector2D AverageVelocity = FVector2D::ZeroVector;
 
-	for (int i = 0; i < NrOfNeighbors; ++i)
-		AverageVelocity += Neighbors[i]->GetLinearVelocity();
+	for (int i = 0; i < GetNrOfNeighbors(); ++i)
+		AverageVelocity += GetNeighbors()[i]->GetLinearVelocity();
 
-	if (NrOfNeighbors > 0)
-		AverageVelocity /= static_cast<float>(NrOfNeighbors);
+	if (GetNrOfNeighbors() > 0)
+		AverageVelocity /= static_cast<float>(GetNrOfNeighbors());
 
 	return AverageVelocity;
 }
