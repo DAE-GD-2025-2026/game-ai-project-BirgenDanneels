@@ -36,6 +36,7 @@ public:
 
 	void AddAgent(ASteeringAgent& Agent);
 	void UpdateAgentCell(ASteeringAgent& Agent, const FVector2D& OldPos);
+	void RenderNeighborHood(const ASteeringAgent& Agent, float QueryRadius);
 
 	void RegisterNeighbors(ASteeringAgent& Agent, float QueryRadius);
 	const TArray<ASteeringAgent*>& GetNeighbors() const { return Neighbors; }
