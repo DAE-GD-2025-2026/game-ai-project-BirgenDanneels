@@ -49,7 +49,7 @@ It was created as part of the course Algorithms 2.
 - Queries only nearby partitions (dictated by a radius) for efficient neighbor searches.
 
 - Significantly reduces the number of agents checked for behaviors, improving performance in large flocks.
-- 
+
 ![Flock With Spatial Partitioning](https://github.com/user-attachments/assets/80a7d32b-4eec-4f6e-a2b7-ddef066d34b2)
 
 ## Debug Drawing
