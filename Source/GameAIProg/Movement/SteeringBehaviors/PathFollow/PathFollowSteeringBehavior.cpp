@@ -38,6 +38,9 @@ SteeringOutput PathFollow::CalculateSteering(float DeltaTime, ASteeringAgent& Ag
 
 	if (pCurrentSteering != nullptr)
 	{
+		if (pCurrentSteering == pSeek)
+			pArrive->ResetMaxVelocity(Agent);
+		
 		return pCurrentSteering->CalculateSteering(DeltaTime, Agent);
 	}
 	return SteeringOutput{};

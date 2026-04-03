@@ -49,10 +49,13 @@ public:
 	Arrive(const ASteeringAgent* Agent);
 	
 	virtual SteeringOutput CalculateSteering(float DeltaT, ASteeringAgent & Agent) override;
+	void SetTargetRadius(float TargetRadius);
+	void ResetMaxVelocity(ASteeringAgent& Agent);
 	
 private:
 	
 	float m_CachedMaxVelocity{};
+	bool m_HasCachedMaxVel{false};
 	
 	float m_SlowRadius{500.f};
 	float m_TargetRadius{100.f};

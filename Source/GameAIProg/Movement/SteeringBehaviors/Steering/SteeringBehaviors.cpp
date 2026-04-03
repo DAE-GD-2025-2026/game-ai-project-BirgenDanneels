@@ -55,10 +55,17 @@ SteeringOutput Flee::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 Arrive::Arrive(const ASteeringAgent* Agent)
 {
     m_CachedMaxVelocity = Agent->GetMaxLinearSpeed();
+    m_HasCachedMaxVel = true;
 }
 
 SteeringOutput Arrive::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
 {
+    if (!m_HasCachedMaxVel)
+    {
+        m_CachedMaxVelocity = Agent.GetMaxLinearSpeed();
+        m_HasCachedMaxVel = true;
+    }
+    
     SteeringOutput Steering = {};
     
     //Set Direction
@@ -115,6 +122,18 @@ SteeringOutput Arrive::CalculateSteering(float DeltaT, ASteeringAgent& Agent)
     }
     
     return Steering;
+}
+
+void Arrive::SetTargetRadius(float TargetRadius)
+{
+    m_TargetRadius = TargetRadius;
+    m_SlowRadius = TargetRadius * 5;
+}
+
+void Arrive::ResetMaxVelocity(ASteeringAgent& Agent)
+{
+    if (m_HasCachedMaxVel)
+        Agent.SetMaxLinearSpeed(m_CachedMaxVelocity);
 }
 
 //FACE
