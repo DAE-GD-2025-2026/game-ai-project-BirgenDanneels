@@ -18,6 +18,7 @@ namespace GameAI
 	private:
 		std::unique_ptr<TriPolygon> pNavPoly;
 
+		bool IsEdgeSharedByTwoTriangles(const TriPolygon::Edge& edge) const;
 		void CreateNavigationGraph();
 	};
 }
