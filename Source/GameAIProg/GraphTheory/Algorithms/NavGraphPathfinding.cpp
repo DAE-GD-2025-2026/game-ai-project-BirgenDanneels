@@ -9,7 +9,7 @@
 using namespace GameAI;
 
 std::vector<FVector2D> NavMeshPathfinding::FindPath(const FVector2D& startPos, const FVector2D& endPos,
-	NavGraph* const pNavGraph, std::vector<FVector2D>& debugNodePositions, std::vector<NavLine>& debugPortals) 
+	NavGraph* const pNavGraph, bool useSmoothing ,std::vector<FVector2D>& debugNodePositions, std::vector<NavLine>& debugPortals) 
 {
 	//Create the path to return
 	std::vector<FVector2D> finalPath{};
@@ -89,17 +89,20 @@ std::vector<FVector2D> NavMeshPathfinding::FindPath(const FVector2D& startPos, c
 	//Debug Visualisation
 	debugNodePositions = finalPath;
 	
-	// Extra: Run optimiser on new graph (First check if everything works without SSFA!)
-	debugPortals = SSFA::FindPortals(nodePath, *pNavGraph->GetNavPolygon());
-	finalPath = SSFA::OptimizePortals(debugPortals, *pNavGraph->GetNavPolygon());
+	
+	if (useSmoothing)
+	{
+		debugPortals = SSFA::FindPortals(nodePath, *pNavGraph->GetNavPolygon());
+		finalPath = SSFA::OptimizePortals(debugPortals, *pNavGraph->GetNavPolygon());
+	}
 	
 	return finalPath;
 }
 
-std::vector<FVector2D> NavMeshPathfinding::FindPath(const FVector2D& startPos, const FVector2D& endPos, NavGraph* const pNavGraph)
+std::vector<FVector2D> NavMeshPathfinding::FindPath(const FVector2D& startPos, const FVector2D& endPos, NavGraph* const pNavGraph, bool useSmoothing)
 {
 	std::vector<FVector2D> debugNodePositions{};
 	std::vector<NavLine> debugPortals{};
 
-	return FindPath(startPos, endPos, pNavGraph, debugNodePositions, debugPortals);
+	return FindPath(startPos, endPos, pNavGraph, useSmoothing, debugNodePositions, debugPortals);
 }

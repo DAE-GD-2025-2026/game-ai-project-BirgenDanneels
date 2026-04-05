@@ -6,7 +6,6 @@
 #include "NavigationSystem.h"
 #include "AI/NavigationSystemBase.h"
 #include "GraphTheory/Algorithms/AStar.h"
-#include "GraphTheory/Algorithms/NavGraphPathfinding.h"
 #include "NavMesh/RecastNavMesh.h"
 #include "Runtime/Navmesh/Public/Detour/DetourNavMesh.h"
 #include "Shared/GameAISpectator.h"
@@ -97,11 +96,15 @@ void ALevel_Navmesh::Tick(float DeltaTime)
 		}
 	}
 	
-	// Todo: Draw the portals travelled through with SSFA
-	// if (bDrawPortals)
-	// {
-	// 	
-	// }
+	if (bDrawPortals)
+	{
+		for (const auto& Portal : DebugPortals)
+		{
+			FVector P1(Portal.P1.X, Portal.P1.Y, 5.0f);
+			FVector P2(Portal.P2.X, Portal.P2.Y, 5.0f);
+			DrawDebugLine(GetWorld(), P1, P2, FColor::Orange, false, -1, 0, 10);
+		}
+	}
 	
 	UpdateImGui();
 }
@@ -147,6 +150,9 @@ void ALevel_Navmesh::UpdateImGui()
 		ImGui::Checkbox("NavPoly", &bDrawNavPoly);
 		ImGui::Checkbox("NavGraph", &bDrawNavGraph);
 		ImGui::Checkbox("Path", &bDrawPath);
+		
+		/*Spacing*/ImGui::Spacing(); ImGui::Separator(); ImGui::Spacing(); ImGui::Spacing();
+		ImGui::Checkbox("Use Smoothing", &bUseSmoothing);
 		ImGui::Checkbox("Portals", &bDrawPortals);
 		
 		//End
@@ -221,8 +227,20 @@ void ALevel_Navmesh::SetTarget()
 
 	LatestMouseWorldPos = WorldLocation + WorldDirection;
 	
-	std::vector<FVector2D> Path =  Pathfinder.FindPath(Agent->GetPosition(), 
-	FVector2D{LatestMouseWorldPos}, NavigationGraph.get());
+	std::vector<FVector2D> Path;
+	if (bDrawPortals)
+	{
+		DebugPortals.clear();
+		
+		Path =  Pathfinder.FindPath(Agent->GetPosition(), 
+		FVector2D{LatestMouseWorldPos}, NavigationGraph.get(), bUseSmoothing,
+		DebugNodePositions, DebugPortals);
+	}
+	else
+	{
+		Path =  Pathfinder.FindPath(Agent->GetPosition(), 
+		FVector2D{LatestMouseWorldPos}, NavigationGraph.get(), bUseSmoothing);
+	}
 
 	DebugDrawPath = Path;
 	

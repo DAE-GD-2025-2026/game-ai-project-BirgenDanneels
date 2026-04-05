@@ -13,8 +13,8 @@ namespace GameAI
 	class NavMeshPathfinding
 	{
 	public:
-		static std::vector<FVector2D> FindPath(const FVector2D& startPos, const FVector2D& endPos, NavGraph* const pNavGraph,
+		static std::vector<FVector2D> FindPath(const FVector2D& startPos, const FVector2D& endPos, NavGraph* const pNavGraph, bool useSmoothing,
 			std::vector<FVector2D>& debugNodePositions, std::vector<NavLine>& debugPortals);
-		static std::vector<FVector2D> FindPath(const FVector2D& startPos, const FVector2D& endPos, NavGraph* const pNavGraph);
+		static std::vector<FVector2D> FindPath(const FVector2D& startPos, const FVector2D& endPos, NavGraph* const pNavGraph, bool useSmoothing);
 	};
 }
