@@ -52,6 +52,20 @@ It was created as part of the course Algorithms 2.
 
 ![Flock With Spatial Partitioning](https://github.com/user-attachments/assets/80a7d32b-4eec-4f6e-a2b7-ddef066d34b2)
 
+## Navigation & Pathfinding
+
+- **Breadth-First Search (BFS)**: Explores all neighbors level by level to find the shortest path in unweighted graphs. Guarantees the shortest path if all edges have equal cost. Useful for grid-based navigation and simple graph traversal.
+
+ - **A***: Combines path cost and heuristic to find the most efficient path in weighted graphs. Optimizes search by predicting distance to the goal. Supports Euclidean or Manhattan heuristics and can be paired with smoothing for natural navigation.
+
+![Astar vs BSF](https://github.com/user-attachments/assets/dd404988-54da-4090-a6e9-abcdbeba64ad)
+
+ - **Navigation Mesh**: Represents the walkable areas of a level as connected polygons. Agents can efficiently query the mesh to find paths around obstacles. Supports dynamic start/end positions by adding temporary nodes and integrates with A* for pathfinding.
+
+ - **SSFA (Simple Stupid Funnel Algorithm)**: Optimizes paths found on the NavMesh by smoothing through the “portals” between polygons. Reduces unnecessary turns, creating natural and efficient movement for agents. Works by defining left-right portal edges and iteratively adjusting the apex to generate a straightened path.
+
+![NavMesh](https://github.com/user-attachments/assets/085b6327-26d9-4a61-a26f-a81211c8374c)
+
 ## Debug Drawing
 - Visualizes steering directions, wandering circle and spatial partitions with number of agents for better understanding and debugging.
 
