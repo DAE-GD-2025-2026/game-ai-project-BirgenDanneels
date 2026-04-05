@@ -215,6 +215,12 @@ TArray<TArray<FVector>> ALevel_Navmesh::ExtractNavMeshTris() const
 void ALevel_Navmesh::SetTarget()
 {
 	GameAI::NavMeshPathfinding Pathfinder{};
+	
+	FVector WorldLocation, WorldDirection;
+	PlayerController->DeprojectMousePositionToWorld(WorldLocation, WorldDirection);
+
+	LatestMouseWorldPos = WorldLocation + WorldDirection;
+	
 	std::vector<FVector2D> Path =  Pathfinder.FindPath(Agent->GetPosition(), 
 	FVector2D{LatestMouseWorldPos}, NavigationGraph.get());
 
