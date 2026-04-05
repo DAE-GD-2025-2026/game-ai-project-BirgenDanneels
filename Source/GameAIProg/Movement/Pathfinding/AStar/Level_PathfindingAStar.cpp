@@ -92,9 +92,9 @@ void ALevel_PathfindingAStar::Tick(float DeltaTime)
 	UpdateImGui();
 	
 	Renderer->RenderGraph(*TerrainGraph);
-	TerrainGraph->DebugDrawCells(GetWorld());
+	if (bDrawGrid)
+		TerrainGraph->DebugDrawCells(GetWorld());
 	TerrainGraph->DrawTerrain(GetWorld());
-	// TODO implement conditional debug draws
 }
 
 void ALevel_PathfindingAStar::CalculatePath()
@@ -106,14 +106,24 @@ void ALevel_PathfindingAStar::CalculatePath()
 		&& PathStartNodeId != PathEndNodeId)
 	{
 		//Select (uncomment) BFS Pathfinding or A* Pathfinding
-		//BFS pathfinder = BFS(TerrainGraph);
-		AStar pathfinder = AStar(TerrainGraph, HeuristicFunction);
-		TerrainNode* const startNode = TerrainGraph->GetNodeAs<TerrainNode>(PathStartNodeId);
-		TerrainNode* const endNode = TerrainGraph->GetNodeAs<TerrainNode>(PathEndNodeId);
+		
+		if (bUseBFS)
+		{
+			BFS pathfinder = BFS(TerrainGraph);
+			TerrainNode* const startNode = TerrainGraph->GetNodeAs<TerrainNode>(PathStartNodeId);
+			TerrainNode* const endNode = TerrainGraph->GetNodeAs<TerrainNode>(PathEndNodeId);
 
-		FoundPath = pathfinder.FindPath(startNode, endNode);
-		// std::cout << "New path calculated using " << typeid(pathfinder).name() << std::endl;
-		UE_LOG(LogTemp, Log, TEXT("New path calculated using %hs"), typeid(pathfinder).name());
+			FoundPath = pathfinder.FindPath(startNode, endNode);
+		}
+		else
+		{
+			AStar pathfinder = AStar(TerrainGraph, HeuristicFunction);
+			TerrainNode* const startNode = TerrainGraph->GetNodeAs<TerrainNode>(PathStartNodeId);
+			TerrainNode* const endNode = TerrainGraph->GetNodeAs<TerrainNode>(PathEndNodeId);
+
+			FoundPath = pathfinder.FindPath(startNode, endNode);
+		}
+		
 		UpdateAgentPath(FoundPath);
 	}
 	else
@@ -186,11 +196,16 @@ void ALevel_PathfindingAStar::UpdateImGui()
 		ImGui::Text("A* Pathfinding");
 		ImGui::Spacing();
 		
-		// TODO conditional debug draws
-		// ImGui::Checkbox("Grid", &bDrawGrid);
-		// ImGui::Checkbox("NodeNumbers", &bDrawNodeNumbers);
-		// ImGui::Checkbox("Connections", &bDrawConnections);
-		// ImGui::Checkbox("Connections Costs", &bDrawConnectionsCosts);
+		ImGui::Checkbox("Use BFS", &bUseBFS);
+		ImGui::Checkbox("Draw Grid", &bDrawGrid);
+		
+		GraphRenderOptions RenderOptions{Renderer->GetRenderOptions()};
+		ImGui::Checkbox("Draw Nodes", &RenderOptions.bDrawNodes );
+		ImGui::Checkbox("Draw NodeNumbers", &RenderOptions.bDrawNodeIds );
+		ImGui::Checkbox("Draw Connections", &RenderOptions.bDrawConnections );
+		ImGui::Checkbox("Draw Connections Costs", &RenderOptions.bDrawConnectionWeights);
+		Renderer->SetRenderOptions(RenderOptions);
+		
 		if (ImGui::Combo("", &SelectedHeuristic, "Manhattan\0Euclidean\0SqEuclidean\0Octile\0Chebyshev", 4))
 		{
 			switch (SelectedHeuristic)

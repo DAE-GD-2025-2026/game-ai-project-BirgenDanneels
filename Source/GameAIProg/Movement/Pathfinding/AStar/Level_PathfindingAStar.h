@@ -59,6 +59,9 @@ private:
 	GameAI::HeuristicFunctions::Heuristic HeuristicFunction = GameAI::HeuristicFunctions::Chebyshev;
 	std::vector<GameAI::Node*> FoundPath{};
 
+	bool bUseBFS{false};
+	bool bDrawGrid{true};
+	
 	void CalculatePath();
 	void UpdateAgentPath(std::vector<GameAI::Node*> const & Path);
 	
